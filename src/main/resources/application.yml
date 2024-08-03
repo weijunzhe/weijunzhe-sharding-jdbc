@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+#      - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+  application:
+    name: weijunzhe-sharding-jdbc
+  shardingsphere:
+    props:
+      sql:
+        show: false # 是否开启sql日志输出
+    datasource:
+      names: ds1
+      ds1:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/ry?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+        username: root
+        password: root
+        initialSize: 5
+        minIdle: 5
+        maxActive: 8
+        maxWait: 10000
+        validationQuery: SELECT 1
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        filters: config
+      binding-tables: user
+      default-database-strategy: # 分库策略
+        inline:
+          sharding-column: id # 分片路由标准
+          algorithm-expression: ry{id % 2} # 分库策略表达式
+
+
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.log4j2.Log4j2LoggerImpl
